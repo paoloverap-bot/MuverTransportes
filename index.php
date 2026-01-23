@@ -16,58 +16,25 @@ try {
     $errorDB = true;
 }
 ?>
-<?php include __DIR__ . '/includes/header.php'; ?>
+
 
     <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="floating-truck">
-            <i class="bi bi-truck"></i>
-        </div>
-        
-        <div class="container">
-            <div class="row min-vh-100 align-items-center">
-                <div class="col-lg-6 text-white hero-content py-5" style="margin-top: 60px;">
-                    <h1 class="hero-title mb-4">
-                        Tu mudanza, <br>
-                        <span style="color: #fbbf24;">simple y sin estrés</span>
-                    </h1>
-                    <p class="hero-subtitle mb-4">
-                        Conectamos a miles de personas con los mejores proveedores de mudanza y flete de Chile. 
-                        Cotiza en segundos y recibe ofertas personalizadas.
-                    </p>
-                    
-                    <div class="d-flex flex-wrap mb-4">
-                        <span class="feature-badge">
-                            <i class="bi bi-check-circle-fill"></i> Cotización gratuita
-                        </span>
-                        <span class="feature-badge">
-                            <i class="bi bi-check-circle-fill"></i> +500 proveedores
-                        </span>
-                        <span class="feature-badge">
-                            <i class="bi bi-check-circle-fill"></i> Cobertura nacional
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="col-lg-6 py-5">
-                    <!-- Espacio para la tarjeta de cotización -->
-                </div>
-            </div>
-        </div>
-    </section>
-    
+<section class="hero-section">
+    <div class="container" style="height:200px; position: relative; z-index: 10;">
+        <?php include __DIR__ . '/includes/header.php'; ?>
+    </div>
     <!-- Quote Card -->
-    <div class="container" style="margin-top: -350px; position: relative; z-index: 10;">
+    <div class="container" style="position: relative; z-index: 10;">
         <div class="row justify-content-center">
             <div class="col-lg-8 col-xl-7">
                 <div class="quote-card">
                     <div class="quote-card-header">
-                        <h2><i class="bi bi-search text-primary me-2"></i>Cotiza tu Mudanza</h2>
+                        <h5><i class="bi bi-search text-primary me-2"></i>Cotiza tu Mudanza</h5>
                         <p>Completa los datos y recibe cotizaciones de proveedores cercanos</p>
                     </div>
                     
                     <!-- Step Indicator -->
-                    <div class="step-indicator">
+                    <!--<div class="step-indicator">
                         <div class="step active">
                             <span class="step-number">1</span>
                             <span>Origen</span>
@@ -80,7 +47,7 @@ try {
                             <span class="step-number">3</span>
                             <span>Servicio</span>
                         </div>
-                    </div>
+                    </div>-->
                     
                     <!-- Alert Container -->
                     <div id="alertContainer" class="mb-3"></div>
@@ -95,6 +62,26 @@ try {
                     <!-- Formulario de Cotización -->
                     <form id="formCotizacion" method="POST" action="api/guardar_busqueda.php">
                         
+                                            <!-- Tipo de Servicio -->
+                        <div class="mb-4">
+                            <label for="id_tipo_servicio" class="form-label">
+                                <i class="bi bi-truck me-1"></i> Tipo de Servicio
+                            </label>
+                            <select class="form-select" id="id_tipo_servicio" name="id_tipo_servicio" required>
+                                <option value="">Selecciona el tipo de servicio</option>
+                                <?php if (empty($tiposServicio)): ?>
+                                    <option value="1">Mudanza Residencial</option>
+                                    <option value="2">Mudanza Comercial</option>
+                                    <option value="3">Flete</option>
+                                <?php else: ?>
+                                    <?php foreach ($tiposServicio as $tipo): ?>
+                                    <option value="<?php echo $tipo['id_tipo_servicio']; ?>">
+                                        <?php echo htmlspecialchars($tipo['descripcion']); ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
                         <!-- Lugar de Partida -->
                         <div class="mb-4">
                             <label for="lugar_partida" class="form-label">
@@ -114,7 +101,7 @@ try {
                         </div>
                         
                         <!-- Región Origen (opcional) -->
-                        <div class="mb-4">
+                       <!-- <div class="mb-4">
                             <label for="region_origen" class="form-label">
                                 <i class="bi bi-map me-1"></i> Región de Origen
                             </label>
@@ -126,7 +113,7 @@ try {
                                 </option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
+                        </div>-->
                         
                         <hr class="my-4">
                         
@@ -149,7 +136,7 @@ try {
                         </div>
                         
                         <!-- Región Destino (opcional) -->
-                        <div class="mb-4">
+                        <!--<div class="mb-4">
                             <label for="region_destino" class="form-label">
                                 <i class="bi bi-map-fill me-1"></i> Región de Destino
                             </label>
@@ -157,34 +144,15 @@ try {
                                 <option value="">Selecciona una región (opcional)</option>
                                 <?php foreach ($regiones as $region): ?>
                                 <option value="<?php echo htmlspecialchars($region['nombre_region']); ?>">
-                                    <?php echo htmlspecialchars($region['nombre_region']); ?>
+                                    <?php //echo htmlspecialchars($region['nombre_region']); ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
+                        </div>-->
                         
                         <hr class="my-4">
                         
-                        <!-- Tipo de Servicio -->
-                        <div class="mb-4">
-                            <label for="id_tipo_servicio" class="form-label">
-                                <i class="bi bi-truck me-1"></i> Tipo de Servicio
-                            </label>
-                            <select class="form-select" id="id_tipo_servicio" name="id_tipo_servicio" required>
-                                <option value="">Selecciona el tipo de servicio</option>
-                                <?php if (empty($tiposServicio)): ?>
-                                    <option value="1">Mudanza Residencial</option>
-                                    <option value="2">Mudanza Comercial</option>
-                                    <option value="3">Flete</option>
-                                <?php else: ?>
-                                    <?php foreach ($tiposServicio as $tipo): ?>
-                                    <option value="<?php echo $tipo['id_tipo_servicio']; ?>">
-                                        <?php echo htmlspecialchars($tipo['descripcion']); ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
-                        </div>
+
                         
                         <!-- Información adicional (colapsable) -->
                         <div class="mb-4">
@@ -224,6 +192,40 @@ try {
             </div>
         </div>
     </div>
+        <div class="container">
+            <div class="row min-vh-100 align-items-center">
+                <div class="col-lg-6 text-white hero-content py-5" style="margin-top: 60px;">
+                    <h1 class="hero-title mb-4">
+                        Tu mudanza, <br>
+                        <span style="color: #fbbf24;">simple y sin estrés</span>
+                    </h1>
+                    <p class="hero-subtitle mb-4">
+                        Conectamos a miles de personas con los mejores proveedores de mudanza y flete de Chile. 
+                        Cotiza en segundos y recibe ofertas personalizadas.
+                    </p>
+                    
+                    <div class="d-flex flex-wrap mb-4">
+                        <span class="feature-badge">
+                            <i class="bi bi-check-circle-fill"></i> Cotización gratuita
+                        </span>
+                        <span class="feature-badge">
+                            <i class="bi bi-check-circle-fill"></i> +500 proveedores
+                        </span>
+                        <span class="feature-badge">
+                            <i class="bi bi-check-circle-fill"></i> Cobertura nacional
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 py-5">
+                    <!-- Espacio para la tarjeta de cotización -->
+                </div>
+            </div>
+        </div>
+        
+    </section>
+    
+
     
     <!-- Espaciador -->
     <div style="height: 100px;"></div>
