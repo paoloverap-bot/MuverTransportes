@@ -71,58 +71,48 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Google Maps Autocomplete (opcional para futuro) -->
+    <!-- Validación del formulario antes de enviar -->
     <script>
-        // Función para manejar el envío del formulario con AJAX
-        document.getElementById('formCotizacion')?.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
+        // Función para manejar el envío del formulario
+        document.getElementById('formCotizacion')?.addEventListener('submit', function(e) {
             const btn = document.getElementById('btnCotizar');
             const alertContainer = document.getElementById('alertContainer');
             
-            // Mostrar loading
-            btn.classList.add('loading');
-            btn.disabled = true;
+            // Obtener coordenadas
+            const origenLat = document.getElementById('origen_lat')?.value;
+            const origenLng = document.getElementById('origen_lng')?.value;
+            const destinoLat = document.getElementById('destino_lat')?.value;
+            const destinoLng = document.getElementById('destino_lng')?.value;
             
-            try {
-                const formData = new FormData(this);
-                
-                const response = await fetch('api/guardar_busqueda.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alertContainer.innerHTML = `
-                        <div class="alert alert-custom alert-success-custom">
-                            <i class="bi bi-check-circle-fill me-2"></i>
-                            ${result.message}
-                            <br><small>ID de búsqueda: #${result.id_busqueda}</small>
-                        </div>
-                    `;
-                    // Opcional: limpiar formulario
-                    // this.reset();
-                } else {
-                    alertContainer.innerHTML = `
-                        <div class="alert alert-custom alert-danger-custom">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            ${result.message}
-                        </div>
-                    `;
-                }
-            } catch (error) {
+            // Validar que se seleccionaron direcciones válidas del autocomplete
+            if (!origenLat || !origenLng || origenLat === '' || origenLng === '') {
+                e.preventDefault();
                 alertContainer.innerHTML = `
                     <div class="alert alert-custom alert-danger-custom">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        Error de conexión. Por favor, intente nuevamente.
+                        Por favor, selecciona una dirección de origen válida de las sugerencias.
                     </div>
                 `;
-            } finally {
-                btn.classList.remove('loading');
-                btn.disabled = false;
+                return false;
             }
+            
+            if (!destinoLat || !destinoLng || destinoLat === '' || destinoLng === '') {
+                e.preventDefault();
+                alertContainer.innerHTML = `
+                    <div class="alert alert-custom alert-danger-custom">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Por favor, selecciona una dirección de destino válida de las sugerencias.
+                    </div>
+                `;
+                return false;
+            }
+            
+            // Mostrar loading mientras redirige
+            btn.classList.add('loading');
+            btn.disabled = true;
+            
+            // El formulario se enviará normalmente (GET a resultados.php)
+            return true;
         });
     </script>
 </body>

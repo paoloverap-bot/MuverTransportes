@@ -1,3 +1,88 @@
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiqMuCjLrbE7h6sW87VOq7Cy0OgluTqDU&libraries=places&language=es&region=CL"
+  async
+  defer
+></script>
+<script>
+  let autocompleteStart;
+  let autocompleteEnd;
+  
+  // Variables para almacenar coordenadas
+  let origenLat = null;
+  let origenLng = null;
+  let destinoLat = null;
+  let destinoLng = null;
+
+  function initAutocomplete() {
+    // Autocomplete para dirección de ORIGEN
+    const inputStart = document.getElementById("moving_start_address");
+
+    autocompleteStart = new google.maps.places.Autocomplete(inputStart, {
+      types: ["geocode"], // direcciones
+      componentRestrictions: { country: "cl" }, // Chile
+      fields: ["address_components", "formatted_address", "geometry"]
+    });
+
+    autocompleteStart.addListener("place_changed", () => {
+      const place = autocompleteStart.getPlace();
+
+      if (!place.geometry) {
+        console.warn("Dirección sin geometría");
+        return;
+      }
+
+      // Guardar coordenadas
+      origenLat = place.geometry.location.lat();
+      origenLng = place.geometry.location.lng();
+      
+      // Actualizar inputs hidden
+      document.getElementById("origen_lat").value = origenLat;
+      document.getElementById("origen_lng").value = origenLng;
+      document.getElementById("origen_direccion").value = place.formatted_address;
+      
+      // Actualizar el input visible con la dirección formateada
+      inputStart.value = place.formatted_address;
+
+      console.log("Dirección inicio:", place.formatted_address);
+      console.log("Lat:", origenLat, "Lng:", origenLng);
+    });
+
+    // Autocomplete para dirección de DESTINO
+    const inputEnd = document.getElementById("moving_end_address");
+
+    autocompleteEnd = new google.maps.places.Autocomplete(inputEnd, {
+      types: ["geocode"], // direcciones
+      componentRestrictions: { country: "cl" }, // Chile
+      fields: ["address_components", "formatted_address", "geometry"]
+    });
+
+    autocompleteEnd.addListener("place_changed", () => {
+      const place = autocompleteEnd.getPlace();
+
+      if (!place.geometry) {
+        console.warn("Dirección sin geometría");
+        return;
+      }
+
+      // Guardar coordenadas
+      destinoLat = place.geometry.location.lat();
+      destinoLng = place.geometry.location.lng();
+      
+      // Actualizar inputs hidden
+      document.getElementById("destino_lat").value = destinoLat;
+      document.getElementById("destino_lng").value = destinoLng;
+      document.getElementById("destino_direccion").value = place.formatted_address;
+      
+      // Actualizar el input visible con la dirección formateada
+      inputEnd.value = place.formatted_address;
+
+      console.log("Dirección destino:", place.formatted_address);
+      console.log("Lat:", destinoLat, "Lng:", destinoLng);
+    });
+  }
+
+  window.addEventListener("load", initAutocomplete);
+</script>
 <?php
 /**
  * Página principal - Cotización de Mudanzas
@@ -60,7 +145,14 @@ try {
                     <?php endif; ?>
                     
                     <!-- Formulario de Cotización -->
-                    <form id="formCotizacion" method="POST" action="api/guardar_busqueda.php">
+                    <form id="formCotizacion" method="GET" action="resultados.php">
+                        <!-- Inputs hidden para coordenadas -->
+                        <input type="hidden" id="origen_lat" name="origen_lat" value="">
+                        <input type="hidden" id="origen_lng" name="origen_lng" value="">
+                        <input type="hidden" id="origen_direccion" name="origen_direccion" value="">
+                        <input type="hidden" id="destino_lat" name="destino_lat" value="">
+                        <input type="hidden" id="destino_lng" name="destino_lng" value="">
+                        <input type="hidden" id="destino_direccion" name="destino_direccion" value="">
                         
                                             <!-- Tipo de Servicio -->
                         <div class="mb-4">
@@ -89,32 +181,10 @@ try {
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-house-door"></i></span>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="lugar_partida" 
-                                       name="lugar_partida" 
-                                       placeholder="Ej: Av. Providencia 1234, Providencia, Santiago"
-                                       required
-                                       autocomplete="off">
+                                <input placeholder="Dirección" type="text" name="moving[start_address]" id="moving_start_address" class="form-control gmaps-start-address" aria-expanded="true" aria-autocomplete="list" aria-controls="autocomplete-listbox-pac-epsmsse" aria-label="Buscar ubicación" aria-haspopup="listbox" role="combobox" autocomplete="off">    
                             </div>
                             <small class="text-muted">Ingresa la dirección completa incluyendo comuna y ciudad</small>
                         </div>
-                        
-                        <!-- Región Origen (opcional) -->
-                       <!-- <div class="mb-4">
-                            <label for="region_origen" class="form-label">
-                                <i class="bi bi-map me-1"></i> Región de Origen
-                            </label>
-                            <select class="form-select" id="region_origen" name="region_origen">
-                                <option value="">Selecciona una región (opcional)</option>
-                                <?php foreach ($regiones as $region): ?>
-                                <option value="<?php echo htmlspecialchars($region['nombre_region']); ?>">
-                                    <?php echo htmlspecialchars($region['nombre_region']); ?>
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>-->
-                        
                         <hr class="my-4">
                         
                         <!-- Lugar de Destino -->
@@ -124,13 +194,7 @@ try {
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-flag"></i></span>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="lugar_destino" 
-                                       name="lugar_destino" 
-                                       placeholder="Ej: Los Carrera 567, Viña del Mar"
-                                       required
-                                       autocomplete="off">
+                                <input placeholder="Dirección" type="text" name="moving[end_address]" id="moving_end_address" class="form-control gmaps-end-address" aria-expanded="true" aria-autocomplete="list" aria-controls="autocomplete-listbox-pac-epsmsse" aria-label="Buscar ubicación" aria-haspopup="listbox" role="combobox" autocomplete="off">    
                             </div>
                             <small class="text-muted">Ingresa la dirección de destino de tu mudanza</small>
                         </div>
